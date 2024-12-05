@@ -1,8 +1,12 @@
 {
     "usuarios": [
         {
-            "nome": "lucas",
-            "senha": "1234"
+            "nome": "aaa",
+            "senha": "111"
+        },
+        {
+            "nome": "111",
+            "senha": "111"
         }
     ]
 }
