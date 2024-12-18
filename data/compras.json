@@ -3,14 +3,15 @@
         "nome": "gabriel",
         "compras": [
             {
-                "valor": 43.0,
-                "categoria": "roupa",
-                "date": "2024-12-05"
-            },
-            {
-                "valor": 54.0,
-                "categoria": "carro",
-                "date": "2024-12-05"
+                "alimentacao": [],
+                "higiene": [
+                    30.0
+                ],
+                "transporte": [],
+                "roupa": [
+                    40.0
+                ],
+                "lazer": []
             }
         ]
     }
