@@ -1,9 +1,18 @@
-{
-    "alimentacao": [
-        1.0
-    ],
-    "higiene": [],
-    "transporte": [],
-    "roupa": [],
-    "lazer": []
-}
+[
+    {
+        "nome": "gabriel",
+        "compras": [
+            {
+                "alimentacao": [],
+                "higiene": [
+                    30.0
+                ],
+                "transporte": [],
+                "roupa": [
+                    40.0
+                ],
+                "lazer": []
+            }
+        ]
+    }
+]

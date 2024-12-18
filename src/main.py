@@ -3,6 +3,7 @@ from auth import register_user, authenticate_user
 import json
 import os
 
+current_user = None
 
 COMPRAS_FILE = "data/compras.json"
 
@@ -24,9 +25,12 @@ def main(page: ft.Page):
 
     # Login handler
     def handle_login(e):
+        global current_user  # Permite modificar a variável global
         username = login_username.value
         password = login_password.value
+
         if authenticate_user(username, password):
+            current_user = username  # Armazena o nome do usuário logado
             show_snackbar("Login bem-sucedido!", success=True)
             page.clean()
             page.add(menu_principal)
@@ -58,7 +62,7 @@ def main(page: ft.Page):
     def initialize_compras_file():
         if not os.path.exists(COMPRAS_FILE):
             with open(COMPRAS_FILE, "w") as f:
-                json.dump({"alimentacao": [], "higiene": [], "transporte": [], "roupa": [], "lazer": []}, f)
+                json.dump([], f)
 
     # Carrega os dados de compras
     def load_compras():
@@ -82,6 +86,28 @@ def main(page: ft.Page):
                     return
                 
                 compras = load_compras()
+                
+                # Verifica se o usuário já possui registro no JSON
+                usuario_existente = next((u for u in compras if u["nome"] == current_user), None)
+
+                if not usuario_existente:
+                    # Cria estrutura inicial para o usuário
+                    usuario_existente = {
+                        "nome": current_user,
+                        "compras": [
+                            {"alimentacao": [], "higiene": [], "transporte": [], "roupa": [], "lazer": []}
+                        ]
+                    }
+                    compras.append(usuario_existente)
+
+                # Adiciona o valor à categoria do usuário
+                usuario_existente["compras"][0][categoria].append(float(valor))
+                save_compras(compras)
+
+                show_snackbar(f"Compra adicionada em {categoria}!", success=True)
+                page.clean()
+                page.add(menu_principal)
+
                 compras[categoria].append(float(valor))
                 save_compras(compras)
                 show_snackbar(f"Compra adicionada em {categoria}!", success=True)
