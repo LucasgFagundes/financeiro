@@ -1,5 +1,10 @@
 import flet as ft
 from auth import register_user, authenticate_user
+import json
+import os
+
+
+COMPRAS_FILE = "data/compras.json"
 
 def main(page: ft.Page):
     page.title = 'CashMind'
@@ -44,6 +49,102 @@ def main(page: ft.Page):
             page.add(login)
         else:
             show_snackbar("Usuário já existe.", success=False)
+
+    
+
+    
+
+    # Inicializa o arquivo de compras, se necessário
+    def initialize_compras_file():
+        if not os.path.exists(COMPRAS_FILE):
+            with open(COMPRAS_FILE, "w") as f:
+                json.dump({"alimentacao": [], "higiene": [], "transporte": [], "roupa": [], "lazer": []}, f)
+
+    # Carrega os dados de compras
+    def load_compras():
+        initialize_compras_file()
+        with open(COMPRAS_FILE, "r") as f:
+            return json.load(f)
+
+    # Salva os dados de compras
+    def save_compras(compras):
+        with open(COMPRAS_FILE, "w") as f:
+            json.dump(compras, f, indent=4)
+
+    # Adicionar compra
+    def compra(e):
+        # Função chamada após escolher uma categoria
+        def handle_categoria(categoria):
+            def add_valor(e):
+                valor = valor_compra.value
+                if not valor or not valor.isdigit():
+                    show_snackbar("Digite um valor válido.", success=False)
+                    return
+                
+                compras = load_compras()
+                compras[categoria].append(float(valor))
+                save_compras(compras)
+                show_snackbar(f"Compra adicionada em {categoria}!", success=True)
+                page.clean()
+                page.add(menu_principal)
+
+            # Tela para adicionar o valor da compra
+            page.clean()
+            page.add(
+                ft.Column(
+                    controls=[
+                        ft.Container(
+                            bgcolor=ft.colors.WHITE,
+                            border_radius=10,
+                            width=400,
+                            padding=ft.padding.all(10),
+                            content=ft.Column(
+                                [
+                                    ft.Text(f"Adicionar valor para {categoria}", size=20, weight="bold"),
+                                    valor_compra,
+                                    ft.ElevatedButton("Salvar", on_click=add_valor, bgcolor=ft.colors.GREEN),
+                                    ft.TextButton("Cancelar", on_click=lambda _: page.clean() or page.add(menu_principal)),
+                                ],
+                                spacing=15,
+                            ),
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                )
+            )
+
+        # Tela para escolher a categoria
+        page.clean()
+        valor_compra = ft.TextField(hint_text="Digite o valor", prefix_icon=ft.icons.MONEY)
+        page.add(
+            ft.Column(
+                controls=[
+                    ft.Container(
+                        bgcolor=ft.colors.WHITE,
+                        border_radius=10,
+                        width=400,
+                        padding=ft.padding.all(10),
+                        content=ft.Column(
+                            [
+                                ft.Text("Escolha a categoria", size=20, weight="bold"),
+                                ft.ElevatedButton("Alimentação", on_click=lambda _: handle_categoria("alimentacao"), bgcolor=ft.colors.BLUE),
+                                ft.ElevatedButton("Higiene", on_click=lambda _: handle_categoria("higiene"), bgcolor=ft.colors.BLUE),
+                                ft.ElevatedButton("Transporte", on_click=lambda _: handle_categoria("transporte"), bgcolor=ft.colors.BLUE),
+                                ft.ElevatedButton("Roupa", on_click=lambda _: handle_categoria("roupa"), bgcolor=ft.colors.BLUE),
+                                ft.ElevatedButton("Lazer", on_click=lambda _: handle_categoria("lazer"), bgcolor=ft.colors.BLUE),
+                                ft.TextButton("Cancelar", on_click=lambda _: page.clean() or page.add(menu_principal)),
+                            ],
+                            spacing=15,
+                        ),
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+            )
+        )
+
+        
+
+
 
     # Controles do login
     login_username = ft.TextField(hint_text="Digite seu usuário", prefix_icon=ft.icons.PERSON)
@@ -108,6 +209,7 @@ def main(page: ft.Page):
                 content=ft.Column(
                     [
                         ft.Text("Menu Principal", size=20, weight="bold"),
+                        ft.ElevatedButton("Adicionar compra", on_click=compra, bgcolor=ft.colors.GREEN),
                         ft.ElevatedButton("Logout", on_click=lambda _: page.clean() or page.add(login), bgcolor=ft.colors.RED),
                     ],
                     spacing=15,
@@ -116,6 +218,8 @@ def main(page: ft.Page):
         ],
         alignment=ft.MainAxisAlignment.CENTER,
     )
+
+    
 
     # Inicializa com a tela de login
     page.add(login)

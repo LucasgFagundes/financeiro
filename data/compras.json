@@ -1,17 +1,9 @@
-[
-    {
-        "nome": "gabriel",
-        "compras": [
-            {
-                "valor": 43.0,
-                "categoria": "roupa",
-                "date": "2024-12-05"
-            },
-            {
-                "valor": 54.0,
-                "categoria": "carro",
-                "date": "2024-12-05"
-            }
-        ]
-    }
-]
+{
+    "alimentacao": [
+        1.0
+    ],
+    "higiene": [],
+    "transporte": [],
+    "roupa": [],
+    "lazer": []
+}
