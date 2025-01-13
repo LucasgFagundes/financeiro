@@ -2,6 +2,8 @@ import flet as ft
 from auth import Auth
 import json
 import os
+from compras import CompraManager
+
 
 current_user = None
 COMPRAS_FILE = "../data/compras.json"
@@ -58,117 +60,114 @@ def main(page: ft.Page):
     
 
     # Inicializa o arquivo de compras, se necessário
-    def initialize_compras_file():
-        if not os.path.exists(COMPRAS_FILE):
-            with open(COMPRAS_FILE, "w") as f:
-                json.dump([], f)
+    # def initialize_compras_file():
+    #     if not os.path.exists(COMPRAS_FILE):
+    #         with open(COMPRAS_FILE, "w") as f:
+    #             json.dump([], f)
 
-    # Carrega os dados de compras
-    def load_compras():
-        initialize_compras_file()
-        with open(COMPRAS_FILE, "r") as f:
-            return json.load(f)
+    # # Carrega os dados de compras
+    # def load_compras():
+    #     initialize_compras_file()
+    #     with open(COMPRAS_FILE, "r") as f:
+    #         return json.load(f)
 
-    # Salva os dados de compras
-    def save_compras(compras):
-        with open(COMPRAS_FILE, "w") as f:
-            json.dump(compras, f, indent=4)
+    # # Salva os dados de compras
+    # def save_compras(compras):
+    #     with open(COMPRAS_FILE, "w") as f:
+    #         json.dump(compras, f, indent=4)
 
-    # Adicionar compra
-    def compra(e):
-        # Função chamada após escolher uma categoria
-        def handle_categoria(categoria):
-            def add_valor(e):
-                valor = valor_compra.value
-                if not valor or not valor.isdigit():
-                    show_snackbar("Digite um valor válido.", success=False)
-                    return
+    # # Adicionar compra
+    # def compra(e):
+    #     # Função chamada após escolher uma categoria
+    #     def handle_categoria(categoria):
+    #         def add_valor(e):
+    #             valor = valor_compra.value
+    #             if not valor or not valor.isdigit():
+    #                 show_snackbar("Digite um valor válido.", success=False)
+    #                 return
                 
-                compras = load_compras()
+    #             compras = load_compras()
                 
-                # Verifica se o usuário já possui registro no JSON
-                usuario_existente = next((u for u in compras if u["nome"] == current_user), None)
+    #             # Verifica se o usuário já possui registro no JSON
+    #             usuario_existente = next((u for u in compras if u["nome"] == current_user), None)
 
-                if not usuario_existente:
-                    # Cria estrutura inicial para o usuário
-                    usuario_existente = {
-                        "nome": current_user,
-                        "compras": [
-                            {"alimentacao": [], "higiene": [], "transporte": [], "roupa": [], "lazer": []}
-                        ]
-                    }
-                    compras.append(usuario_existente)
+    #             if not usuario_existente:
+    #                 # Cria estrutura inicial para o usuário
+    #                 usuario_existente = {
+    #                     "nome": current_user,
+    #                     "compras": [
+    #                         {"alimentacao": [], "higiene": [], "transporte": [], "roupa": [], "lazer": []}
+    #                     ]
+    #                 }
+    #                 compras.append(usuario_existente)
 
-                # Adiciona o valor à categoria do usuário
-                usuario_existente["compras"][0][categoria].append(float(valor))
-                save_compras(compras)
+    #             # Adiciona o valor à categoria do usuário
+    #             usuario_existente["compras"][0][categoria].append(float(valor))
+    #             save_compras(compras)
 
-                show_snackbar(f"Compra adicionada em {categoria}!", success=True)
-                page.clean()
-                page.add(menu_principal)
+    #             show_snackbar(f"Compra adicionada em {categoria}!", success=True)
+    #             page.clean()
+    #             page.add(menu_principal)
 
-                compras[categoria].append(float(valor))
-                save_compras(compras)
-                show_snackbar(f"Compra adicionada em {categoria}!", success=True)
-                page.clean()
-                page.add(menu_principal)
+    #             compras[categoria].append(float(valor))
+    #             save_compras(compras)
+    #             show_snackbar(f"Compra adicionada em {categoria}!", success=True)
+    #             page.clean()
+    #             page.add(menu_principal)
 
-            # Tela para adicionar o valor da compra
-            page.clean()
-            page.add(
-                ft.Column(
-                    controls=[
-                        ft.Container(
-                            bgcolor=ft.colors.WHITE,
-                            border_radius=10,
-                            width=400,
-                            padding=ft.padding.all(10),
-                            content=ft.Column(
-                                [
-                                    ft.Text(f"Adicionar valor para {categoria}", size=20, weight="bold"),
-                                    valor_compra,
-                                    ft.ElevatedButton("Salvar", on_click=add_valor, bgcolor=ft.colors.GREEN),
-                                    ft.TextButton("Cancelar", on_click=lambda _: page.clean() or page.add(menu_principal)),
-                                ],
-                                spacing=15,
-                            ),
-                        )
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                )
-            )
+    #         # Tela para adicionar o valor da compra
+    #         page.clean()
+    #         page.add(
+    #             ft.Column(
+    #                 controls=[
+    #                     ft.Container(
+    #                         bgcolor=ft.colors.WHITE,
+    #                         border_radius=10,
+    #                         width=400,
+    #                         padding=ft.padding.all(10),
+    #                         content=ft.Column(
+    #                             [
+    #                                 ft.Text(f"Adicionar valor para {categoria}", size=20, weight="bold"),
+    #                                 valor_compra,
+    #                                 ft.ElevatedButton("Salvar", on_click=add_valor, bgcolor=ft.colors.GREEN),
+    #                                 ft.TextButton("Cancelar", on_click=lambda _: page.clean() or page.add(menu_principal)),
+    #                             ],
+    #                             spacing=15,
+    #                         ),
+    #                     )
+    #                 ],
+    #                 alignment=ft.MainAxisAlignment.CENTER,
+    #             )
+    #         )
 
-        # Tela para escolher a categoria
-        page.clean()
-        valor_compra = ft.TextField(hint_text="Digite o valor", prefix_icon=ft.icons.MONEY)
-        page.add(
-            ft.Column(
-                controls=[
-                    ft.Container(
-                        bgcolor=ft.colors.WHITE,
-                        border_radius=10,
-                        width=400,
-                        padding=ft.padding.all(10),
-                        content=ft.Column(
-                            [
-                                ft.Text("Escolha a categoria", size=20, weight="bold"),
-                                ft.ElevatedButton("Alimentação", on_click=lambda _: handle_categoria("alimentacao"), bgcolor=ft.colors.BLUE),
-                                ft.ElevatedButton("Higiene", on_click=lambda _: handle_categoria("higiene"), bgcolor=ft.colors.BLUE),
-                                ft.ElevatedButton("Transporte", on_click=lambda _: handle_categoria("transporte"), bgcolor=ft.colors.BLUE),
-                                ft.ElevatedButton("Roupa", on_click=lambda _: handle_categoria("roupa"), bgcolor=ft.colors.BLUE),
-                                ft.ElevatedButton("Lazer", on_click=lambda _: handle_categoria("lazer"), bgcolor=ft.colors.BLUE),
-                                ft.TextButton("Cancelar", on_click=lambda _: page.clean() or page.add(menu_principal)),
-                            ],
-                            spacing=15,
-                        ),
-                    )
-                ],
-                alignment=ft.MainAxisAlignment.CENTER,
-            )
-        )
-
-        
-
+    #     # Tela para escolher a categoria
+    #     page.clean()
+    #     valor_compra = ft.TextField(hint_text="Digite o valor", prefix_icon=ft.icons.MONEY)
+    #     page.add(
+    #         ft.Column(
+    #             controls=[
+    #                 ft.Container(
+    #                     bgcolor=ft.colors.WHITE,
+    #                     border_radius=10,
+    #                     width=400,
+    #                     padding=ft.padding.all(10),
+    #                     content=ft.Column(
+    #                         [
+    #                             ft.Text("Escolha a categoria", size=20, weight="bold"),
+    #                             ft.ElevatedButton("Alimentação", on_click=lambda _: handle_categoria("alimentacao"), bgcolor=ft.colors.BLUE),
+    #                             ft.ElevatedButton("Higiene", on_click=lambda _: handle_categoria("higiene"), bgcolor=ft.colors.BLUE),
+    #                             ft.ElevatedButton("Transporte", on_click=lambda _: handle_categoria("transporte"), bgcolor=ft.colors.BLUE),
+    #                             ft.ElevatedButton("Roupa", on_click=lambda _: handle_categoria("roupa"), bgcolor=ft.colors.BLUE),
+    #                             ft.ElevatedButton("Lazer", on_click=lambda _: handle_categoria("lazer"), bgcolor=ft.colors.BLUE),
+    #                             ft.TextButton("Cancelar", on_click=lambda _: page.clean() or page.add(menu_principal)),
+    #                         ],
+    #                         spacing=15,
+    #                     ),
+    #                 )
+    #             ],
+    #             alignment=ft.MainAxisAlignment.CENTER,
+    #         )
+    #     )
 
 
     # Controles do login
@@ -223,6 +222,29 @@ def main(page: ft.Page):
         alignment=ft.MainAxisAlignment.CENTER,
     )
 
+    menu = ft.Column(
+        controls=[
+            ft.Container(
+                bgcolor=ft.colors.BLUE_GREY_500,
+                border_radius=10,
+                width=400,
+                padding=ft.padding.all(10),
+                content=ft.Column(
+                    [
+                        ft.Text("Menu Principal", size=20, weight="bold"),
+                        ft.ElevatedButton("Adicionar compra", bgcolor=ft.colors.GREEN),
+                        ft.ElevatedButton("Logout", on_click=lambda _: page.clean() or page.add(login), bgcolor=ft.colors.RED),
+                    ],
+                    spacing=15,
+                ),
+            )
+        ],
+        alignment=ft.MainAxisAlignment.CENTER,
+    )
+    
+    compra = CompraManager(login_username, page, menu)
+
+
     # Menu principal
     menu_principal = ft.Column(
         controls=[
@@ -234,7 +256,7 @@ def main(page: ft.Page):
                 content=ft.Column(
                     [
                         ft.Text("Menu Principal", size=20, weight="bold"),
-                        ft.ElevatedButton("Adicionar compra", on_click=compra, bgcolor=ft.colors.GREEN),
+                        ft.ElevatedButton("Adicionar compra", on_click=compra.compra, bgcolor=ft.colors.GREEN),
                         ft.ElevatedButton("Logout", on_click=lambda _: page.clean() or page.add(login), bgcolor=ft.colors.RED),
                     ],
                     spacing=15,
@@ -243,7 +265,6 @@ def main(page: ft.Page):
         ],
         alignment=ft.MainAxisAlignment.CENTER,
     )
-
     
 
     # Inicializa com a tela de login
