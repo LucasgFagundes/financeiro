@@ -1,11 +1,10 @@
 import flet as ft
-from auth import register_user, authenticate_user
+from auth import Auth
 import json
 import os
 
 current_user = None
-
-COMPRAS_FILE = "data/compras.json"
+COMPRAS_FILE = "../data/compras.json"
 
 def main(page: ft.Page):
     page.title = 'CashMind'
@@ -28,8 +27,9 @@ def main(page: ft.Page):
         global current_user  # Permite modificar a variável global
         username = login_username.value
         password = login_password.value
+        auth = Auth(username, password)
 
-        if authenticate_user(username, password):
+        if auth.authenticate_user():
             current_user = username  # Armazena o nome do usuário logado
             show_snackbar("Login bem-sucedido!", success=True)
             page.clean()
@@ -42,19 +42,18 @@ def main(page: ft.Page):
         username = register_username.value
         password = register_password.value
         confirm_password = confirm_register_password.value
+        auth = Auth(username, password)
 
         if not username or not password:
             show_snackbar("Preencha todos os campos.", success=False)
         elif password != confirm_password:
             show_snackbar("As senhas não coincidem.", success=False)
-        elif register_user(username, password):
+        elif auth.register_user():
             show_snackbar("Conta criada com sucesso!", success=True)
             page.clean()
             page.add(login)
         else:
             show_snackbar("Usuário já existe.", success=False)
-
-    
 
     
 
@@ -178,7 +177,7 @@ def main(page: ft.Page):
     login = ft.Column(
         controls=[
             ft.Container(
-                bgcolor=ft.colors.WHITE,
+                bgcolor=ft.colors.BLUE_GREY_600,
                 border_radius=10,
                 width=400,
                 padding=ft.padding.all(10),
@@ -204,7 +203,7 @@ def main(page: ft.Page):
     register = ft.Column(
         controls=[
             ft.Container(
-                bgcolor=ft.colors.WHITE,
+                bgcolor=ft.colors.BLUE_GREY_500,
                 border_radius=10,
                 width=400,
                 padding=ft.padding.all(10),
@@ -228,7 +227,7 @@ def main(page: ft.Page):
     menu_principal = ft.Column(
         controls=[
             ft.Container(
-                bgcolor=ft.colors.WHITE,
+                bgcolor=ft.colors.BLUE_GREY_500,
                 border_radius=10,
                 width=400,
                 padding=ft.padding.all(10),
