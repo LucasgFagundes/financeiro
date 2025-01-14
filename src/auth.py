@@ -1,42 +1,39 @@
 import json
 import os
 
-DATA_FILE = "../data/usuarios.json"
+class AuthManager:
+    """Classe para gerenciar autenticação e registro de usuários."""
 
-# Carrega os dados existentes
+    DATA_FILE = "data/usuarios.json"
 
-class Auth:
+    def __init__(self):
+        self._initialize_data_file()
 
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-    """Classe responsável pela autenticação e registro de usuários."""
-    def load_users(self):
-        if not os.path.exists(DATA_FILE):
-            with open(DATA_FILE, "w") as f:
+    def _initialize_data_file(self):
+        if not os.path.exists(self.DATA_FILE):
+            with open(self.DATA_FILE, "w") as f:
                 json.dump({"usuarios": []}, f)
-        with open(DATA_FILE, "r") as f:
+
+    def _load_users(self):
+        with open(self.DATA_FILE, "r") as f:
             return json.load(f)
-    
-    # Salva os dados no arquivo
-    def save_users(self, users):
-        with open(DATA_FILE, "w") as f:
+
+    def _save_users(self, users):
+        with open(self.DATA_FILE, "w") as f:
             json.dump(users, f, indent=4)
 
-    # Adiciona um novo usuário (registrar)
-    def register_user(self):
-        data = self.load_users()
-        for user in data["usuarios"]:
-            if user["nome"] == self.username:
+    def register_user(self, username, password):
+        users_data = self._load_users()
+        for user in users_data["usuarios"]:
+            if user["nome"] == username:
                 return False  # Usuário já existe
-        data["usuarios"].append({"nome": self.username, "senha": self.password})
-        self.save_users(data)
+        users_data["usuarios"].append({"nome": username, "senha": password})
+        self._save_users(users_data)
         return True
 
-    # Verifica o login
-    def authenticate_user(self):
-        data = self.load_users()
-        for user in data["usuarios"]:
-            if user["nome"] == self.username and user["senha"] == self.password:
+    def authenticate_user(self, username, password):
+        users_data = self._load_users()
+        for user in users_data["usuarios"]:
+            if user["nome"] == username and user["senha"] == password:
                 return True
         return False
