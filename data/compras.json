@@ -3,13 +3,31 @@
         "nome": "gabriel",
         "compras": [
             {
-                "alimentacao": [],
+                "alimentacao": [
+                    1222.0
+                ],
                 "higiene": [
                     30.0
                 ],
-                "transporte": [],
+                "transporte": [
+                    123.0
+                ],
                 "roupa": [
                     40.0
+                ],
+                "lazer": []
+            }
+        ]
+    },
+    {
+        "nome": "lucas",
+        "compras": [
+            {
+                "alimentacao": [],
+                "higiene": [],
+                "transporte": [],
+                "roupa": [
+                    20.0
                 ],
                 "lazer": []
             }
