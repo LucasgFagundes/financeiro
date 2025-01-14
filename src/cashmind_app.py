@@ -172,6 +172,40 @@ class CashMindApp:
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
+        def ver_compras(e):
+            compras = self.compras_manager.get_compras(self.current_user)
+            total_compras = {categoria: sum(map(int, valores)) for categoria, valores in compras.items()}
+            page.clean()
+            page.add(
+                ft.Column(
+                    controls=[
+                    ft.Container(
+                        bgcolor=ft.colors.WHITE,
+                        border_radius=10,
+                        width=400,
+                        padding=ft.padding.all(10),
+                        content=ft.Column(
+                        [
+                            ft.Text("Compras", size=20, weight="bold"),
+                            ft.Text(f"Alimentação: {total_compras['alimentacao']}", color=ft.colors.BLACK),
+                            ft.Text(f"Higiene: {total_compras['higiene']}", color=ft.colors.BLACK),
+                            ft.Text(f"Transporte: {total_compras['transporte']}", color=ft.colors.BLACK),
+                            ft.Text(f"Roupa: {total_compras['roupa']}", color=ft.colors.BLACK),
+                            ft.Text(f"Lazer: {total_compras['lazer']}", color=ft.colors.BLACK),
+                            ft.TextButton(f"Total: {sum(total_compras.values())}", on_click=lambda _: None),
+                            ft.TextButton(
+                            "Voltar",
+                            on_click=lambda _: page.clean() or page.add(menu_principal),
+                            ),
+                        ],
+                        spacing=15,
+                        ),
+                    )
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                )
+            )
+
         menu_principal = ft.Column(
             controls=[
                 ft.Container(
@@ -182,6 +216,7 @@ class CashMindApp:
                     content=ft.Column(
                         [
                             ft.Text("Menu Principal", size=20, weight="bold"),
+                            ft.ElevatedButton("Ver compras", on_click=ver_compras, bgcolor=ft.colors.BLUE),
                             ft.ElevatedButton("Adicionar compra", on_click=compra, bgcolor=ft.colors.GREEN),
                             ft.ElevatedButton("Logout", on_click=lambda _: page.clean() or page.add(login), bgcolor=ft.colors.RED),
                         ],
@@ -192,6 +227,10 @@ class CashMindApp:
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
+        
+
         page.add(login)
+
+
 
 

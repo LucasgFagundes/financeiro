@@ -37,3 +37,10 @@ class ComprasManager:
 
         usuario["compras"][0][categoria].append(float(valor))
         self._save_compras(compras_data)
+
+    def get_compras(self, username):
+        compras_data = self._load_compras()
+        usuario = next((u for u in compras_data if u["nome"] == username), None)
+        if not usuario:
+            return []
+        return usuario["compras"][0]
