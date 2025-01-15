@@ -7,6 +7,7 @@ class CashMindApp:
         self.auth_manager = AuthManager()
         self.compras_manager = ComprasManager()
         self.current_user = None
+        self.categories = self.compras_manager._load_categorias()
 
     def build(self, page: ft.Page):
         page.title = "CashMind"
@@ -93,33 +94,26 @@ class CashMindApp:
 
             page.clean()
             valor_compra = ft.TextField(hint_text="Digite o valor", prefix_icon=ft.icons.MONEY)
+            
             page.add(
                 ft.Column(
                     controls=[
-                        ft.Container(
-                            bgcolor=ft.colors.WHITE,
-                            border_radius=10,
-                            width=400,
-                            padding=ft.padding.all(10),
-                            content=ft.Column(
-                                [
-                                    ft.Text("Escolha a categoria", size=20, weight="bold"),
-                                    ft.ElevatedButton("Alimentação", on_click=lambda _: handle_categoria("alimentacao"), bgcolor=ft.colors.BLUE),
-                                    ft.ElevatedButton("Higiene", on_click=lambda _: handle_categoria("higiene"), bgcolor=ft.colors.BLUE),
-                                    ft.ElevatedButton("Transporte", on_click=lambda _: handle_categoria("transporte"), bgcolor=ft.colors.BLUE),
-                                    ft.ElevatedButton("Roupa", on_click=lambda _: handle_categoria("roupa"), bgcolor=ft.colors.BLUE),
-                                    ft.ElevatedButton("Lazer", on_click=lambda _: handle_categoria("lazer"), bgcolor=ft.colors.BLUE),
-                                    ft.TextButton(
-                                        "Cancelar",
-                                        on_click=lambda _: page.clean() or page.add(menu_principal),
-                                    ),
-                                ],
-                                spacing=15,
-                            ),
-                        )
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
+                        ft.Text("Escolha a categoria", size=20, weight="bold"),
+                        *[
+                            ft.ElevatedButton(
+                                categoria,
+                                on_click=lambda e, cat=categoria: handle_categoria(cat),
+                                bgcolor=ft.colors.BLUE,
+                            )
+                            for categoria in self.categories
+                        ],
+                        ft.TextButton(
+                            "Cancelar",
+                            on_click=lambda _: page.clean() or page.add(menu_principal),
+                        ),
+                    ]
                 )
+
             )
 
         login_username = ft.TextField(hint_text="Digite seu usuário", prefix_icon=ft.icons.PERSON)
@@ -187,15 +181,14 @@ class CashMindApp:
                         content=ft.Column(
                         [
                             ft.Text("Compras", size=20, weight="bold"),
-                            ft.Text(f"Alimentação: {total_compras['alimentacao']}", color=ft.colors.BLACK),
-                            ft.Text(f"Higiene: {total_compras['higiene']}", color=ft.colors.BLACK),
-                            ft.Text(f"Transporte: {total_compras['transporte']}", color=ft.colors.BLACK),
-                            ft.Text(f"Roupa: {total_compras['roupa']}", color=ft.colors.BLACK),
-                            ft.Text(f"Lazer: {total_compras['lazer']}", color=ft.colors.BLACK),
+                            *[
+                                ft.Text(f"{categoria}: {total_compras[categoria]}", color=ft.colors.BLACK)
+                                for categoria in self.categories
+                            ],
                             ft.TextButton(f"Total: {sum(total_compras.values())}", on_click=lambda _: None),
                             ft.TextButton(
-                            "Voltar",
-                            on_click=lambda _: page.clean() or page.add(menu_principal),
+                                "Voltar",
+                                on_click=lambda _: page.clean() or page.add(menu_principal),
                             ),
                         ],
                         spacing=15,

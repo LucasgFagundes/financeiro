@@ -1,39 +1,62 @@
-[
+[   
     {
-        "nome": "gabriel",
+        "nome": "q",
         "compras": [
             {
                 "alimentacao": [
-                    1222.0
+                    1.0
                 ],
                 "higiene": [
-                    30.0
+                    200.0
                 ],
-                "transporte": [
-                    123.0
-                ],
+                "transporte": [],
                 "roupa": [
-                    40.0,
-                    2.0,
-                    12.0
+                    88.0
                 ],
                 "lazer": [
-                    90.0
+                    123.0
+                ],
+                "saude": [],
+                "educacao": [
+                    2.0,
+                    45.0,
+                    40.0,
+                    200.0
                 ]
             }
         ]
     },
     {
-        "nome": "lucas",
+        "nome": "luquinhas",
         "compras": [
             {
                 "alimentacao": [],
                 "higiene": [],
                 "transporte": [],
                 "roupa": [
-                    20.0
+                    30.0
                 ],
-                "lazer": []
+                "lazer": [],
+                "saude": [],
+                "educacao": [
+                    100.0
+                ]
+            }
+        ]
+    },
+    {
+        "nome": "s",
+        "compras": [
+            {
+                "alimentacao": [],
+                "higiene": [],
+                "transporte": [],
+                "roupa": [
+                    3.0
+                ],
+                "lazer": [],
+                "saude": [],
+                "educacao": []
             }
         ]
     }
