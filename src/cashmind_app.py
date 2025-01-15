@@ -7,6 +7,7 @@ class CashMindApp:
         self.auth_manager = AuthManager()
         self.compras_manager = ComprasManager()
         self.current_user = None
+        self.categories = self.compras_manager._load_categorias()
 
     def build(self, page: ft.Page):
         page.title = "CashMind"
@@ -55,11 +56,18 @@ class CashMindApp:
             def handle_categoria(categoria):
                 def add_valor(e):
                     valor = valor_compra.value
-                    if not valor or not valor.isdigit():
-                        show_snackbar("Digite um valor válido.", success=False)
+                    try:
+                        # Tenta converter o valor para float
+                        valor_float = float(valor.replace(",", "."))
+                        if valor_float <= 0:
+                            raise ValueError("O valor deve ser maior que zero.")
+                    except ValueError:
+                        # Exibe erro se a conversão falhar ou se o valor for inválido
+                        show_snackbar("Digite um valor numérico válido.", success=False)
                         return
 
-                    self.compras_manager.add_compra(self.current_user, categoria, valor)
+                    # Adiciona a compra ao gerenciador
+                    self.compras_manager.add_compra(self.current_user, categoria, valor_float)
                     show_snackbar(f"Compra adicionada em {categoria}!", success=True)
                     page.clean()
                     page.add(menu_principal)
@@ -93,33 +101,26 @@ class CashMindApp:
 
             page.clean()
             valor_compra = ft.TextField(hint_text="Digite o valor", prefix_icon=ft.icons.MONEY)
+            
             page.add(
                 ft.Column(
                     controls=[
-                        ft.Container(
-                            bgcolor=ft.colors.WHITE,
-                            border_radius=10,
-                            width=400,
-                            padding=ft.padding.all(10),
-                            content=ft.Column(
-                                [
-                                    ft.Text("Escolha a categoria", size=20, weight="bold"),
-                                    ft.ElevatedButton("Alimentação", on_click=lambda _: handle_categoria("alimentacao"), bgcolor=ft.colors.BLUE),
-                                    ft.ElevatedButton("Higiene", on_click=lambda _: handle_categoria("higiene"), bgcolor=ft.colors.BLUE),
-                                    ft.ElevatedButton("Transporte", on_click=lambda _: handle_categoria("transporte"), bgcolor=ft.colors.BLUE),
-                                    ft.ElevatedButton("Roupa", on_click=lambda _: handle_categoria("roupa"), bgcolor=ft.colors.BLUE),
-                                    ft.ElevatedButton("Lazer", on_click=lambda _: handle_categoria("lazer"), bgcolor=ft.colors.BLUE),
-                                    ft.TextButton(
-                                        "Cancelar",
-                                        on_click=lambda _: page.clean() or page.add(menu_principal),
-                                    ),
-                                ],
-                                spacing=15,
-                            ),
-                        )
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
+                        ft.Text("Escolha a categoria", size=20, weight="bold"),
+                        *[
+                            ft.ElevatedButton(
+                                categoria,
+                                on_click=lambda e, cat=categoria: handle_categoria(cat),
+                                bgcolor=ft.colors.BLUE,
+                            )
+                            for categoria in self.categories
+                        ],
+                        ft.TextButton(
+                            "Cancelar",
+                            on_click=lambda _: page.clean() or page.add(menu_principal),
+                        ),
+                    ]
                 )
+
             )
 
         login_username = ft.TextField(hint_text="Digite seu usuário", prefix_icon=ft.icons.PERSON)
@@ -172,6 +173,39 @@ class CashMindApp:
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
+        def ver_compras(e):
+            compras = self.compras_manager.get_compras(self.current_user)            
+            total_compras = {categoria: sum(map(float, valores)) for categoria, valores in compras.items()}
+            page.clean()
+            page.add(
+                ft.Column(
+                    controls=[
+                    ft.Container(
+                        bgcolor=ft.colors.WHITE,
+                        border_radius=10,
+                        width=400,
+                        padding=ft.padding.all(10),
+                        content=ft.Column(
+                        [
+                            ft.Text("Compras", size=20, weight="bold"),
+                            *[
+                                ft.Text(f"{categoria}: {total_compras[categoria]}", color=ft.colors.BLACK)
+                                for categoria in self.categories
+                            ],
+                            ft.TextButton(f"Total: {sum(total_compras.values())}", on_click=lambda _: None),
+                            ft.TextButton(
+                                "Voltar",
+                                on_click=lambda _: page.clean() or page.add(menu_principal),
+                            ),
+                        ],
+                        spacing=15,
+                        ),
+                    )
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                )
+            )
+
         menu_principal = ft.Column(
             controls=[
                 ft.Container(
@@ -182,6 +216,7 @@ class CashMindApp:
                     content=ft.Column(
                         [
                             ft.Text("Menu Principal", size=20, weight="bold"),
+                            ft.ElevatedButton("Ver compras", on_click=ver_compras, bgcolor=ft.colors.BLUE),
                             ft.ElevatedButton("Adicionar compra", on_click=compra, bgcolor=ft.colors.GREEN),
                             ft.ElevatedButton("Logout", on_click=lambda _: page.clean() or page.add(login), bgcolor=ft.colors.RED),
                         ],
@@ -192,6 +227,10 @@ class CashMindApp:
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
+        
+
         page.add(login)
+
+
 
 
