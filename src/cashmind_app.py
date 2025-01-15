@@ -56,11 +56,18 @@ class CashMindApp:
             def handle_categoria(categoria):
                 def add_valor(e):
                     valor = valor_compra.value
-                    if not valor or not valor.isdigit():
-                        show_snackbar("Digite um valor válido.", success=False)
+                    try:
+                        # Tenta converter o valor para float
+                        valor_float = float(valor.replace(",", "."))
+                        if valor_float <= 0:
+                            raise ValueError("O valor deve ser maior que zero.")
+                    except ValueError:
+                        # Exibe erro se a conversão falhar ou se o valor for inválido
+                        show_snackbar("Digite um valor numérico válido.", success=False)
                         return
 
-                    self.compras_manager.add_compra(self.current_user, categoria, valor)
+                    # Adiciona a compra ao gerenciador
+                    self.compras_manager.add_compra(self.current_user, categoria, valor_float)
                     show_snackbar(f"Compra adicionada em {categoria}!", success=True)
                     page.clean()
                     page.add(menu_principal)
@@ -167,8 +174,8 @@ class CashMindApp:
         )
 
         def ver_compras(e):
-            compras = self.compras_manager.get_compras(self.current_user)
-            total_compras = {categoria: sum(map(int, valores)) for categoria, valores in compras.items()}
+            compras = self.compras_manager.get_compras(self.current_user)            
+            total_compras = {categoria: sum(map(float, valores)) for categoria, valores in compras.items()}
             page.clean()
             page.add(
                 ft.Column(
